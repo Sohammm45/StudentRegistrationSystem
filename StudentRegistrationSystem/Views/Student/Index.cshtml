@@ -1,0 +1,294 @@
+﻿@model IEnumerable<StudentRegistrationSystem.Models.StudentModel>
+
+@{
+    ViewBag.Title = "Student Registration";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Student Registration Form</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f3f7;
+        }
+
+        .form-container {
+            width: 700px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px #bbb;
+        }
+
+            .form-container h2 {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+        table {
+            width: 100%;
+        }
+
+            table td {
+                padding: 8px;
+            }
+
+        input[type="text"], input[type="email"], input[type="tel"] {
+            width: 95%;
+            padding: 6px;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+        }
+
+        .btn {
+            padding: 6px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-add {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-edit {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .grid {
+            width: 85%;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <h2>Student Registration Form</h2>
+
+        <form id="studentForm">
+            <input type="hidden" id="StudentId" />
+
+            <table>
+                <tr>
+                    <td><label>Full Name:</label></td>
+                    <td><input type="text" id="FullName" required /></td>
+                </tr>
+                <tr>
+                    <td><label>Email:</label></td>
+                    <td><input type="email" id="Email" required /></td>
+                </tr>
+                <tr>
+                    <td><label>Mobile No:</label></td>
+                    <td><input type="tel" id="MobileNo" required /></td>
+                </tr>
+                <tr>
+                    <td><label>Gender:</label></td>
+                    <td>
+                        <input type="radio" name="Gender" value="Male" /> Male
+                        <input type="radio" name="Gender" value="Female" /> Female
+                    </td>
+                </tr>
+                <tr>
+                    <td><label>PAN No:</label></td>
+                    <td><input type="text" id="PanNo" /></td>
+                </tr>
+                <tr>
+                    <td><label>Aadhar No:</label></td>
+                    <td><input type="text" id="AadharNo" /></td>
+                </tr>
+                <tr>
+                    <td><label>Passport No:</label></td>
+                    <td><input type="text" id="PassportNo" /></td>
+                </tr>
+                <tr>
+                    <td><label>Voter Id:</label></td>
+                    <td><input type="text" id="VoterId" /></td>
+                </tr>
+                <tr>
+                    <td><label>Driving No:</label></td>
+                    <td><input type="text" id="DrivingNo" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">
+                        <button type="button" id="btnAdd" class="btn btn-add">Add Student</button>
+                        <button type="button" id="btnUpdate" class="btn btn-edit" style="display:none;">Update</button>
+                        <button type="reset" class="btn">Reset</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    <div class="grid">
+        <h3>Student List</h3>
+        <table border="1" cellpadding="8" cellspacing="0">
+            <thead style="background:#eee;">
+                <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Gender</th>
+                    <th>PAN</th>
+                    <th>Aadhar</th>
+                    <th>Passport</th>
+                    <th>Voter</th>
+                    <th>Driving</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="studentTableBody">
+                @foreach (var s in Model)
+                {
+                    <tr data-id="@s.StudentId">
+                        <td>@s.StudentId</td>
+                        <td>@s.FullName</td>
+                        <td>@s.Email</td>
+                        <td>@s.MobileNo</td>
+                        <td>@s.Gender</td>
+                        <td>@s.PanNo</td>
+                        <td>@s.AadharNo</td>
+                        <td>@s.PassportNo</td>
+                        <td>@s.VoterId</td>
+                        <td>@s.DrivingNo</td>
+                        <td>
+                            <button class="btn btn-edit btnEdit">Edit</button>
+                            <button class="btn btn-delete btnDelete">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // 🟢 ADD Student
+        $("#btnAdd").click(function () {
+            const data = {
+                FullName: $("#FullName").val(),
+                Email: $("#Email").val(),
+                MobileNo: $("#MobileNo").val(),
+                Gender: $("input[name='Gender']:checked").val(),
+                PanNo: $("#PanNo").val(),
+                AadharNo: $("#AadharNo").val(),
+                PassportNo: $("#PassportNo").val(),
+                VoterId: $("#VoterId").val(),
+                DrivingNo: $("#DrivingNo").val()
+            };
+
+            $.ajax({
+                url: '/Student/CreateNew',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (res) {
+                    if (res.success) {
+                        alert("✅ Student Added Successfully!");
+                        location.reload();
+                    } else {
+                        alert("❌ " + res.message);
+                    }
+                },
+                error: function (err) {
+                    alert("⚠️ " + err.responseText);
+                }
+            });
+        });
+
+        // 🟠 EDIT Student (fill form)
+        $(document).on("click", ".btnEdit", function () {
+            let row = $(this).closest("tr");
+            $("#StudentId").val(row.data("id"));
+            $("#FullName").val(row.find("td:eq(1)").text());
+            $("#Email").val(row.find("td:eq(2)").text());
+            $("#MobileNo").val(row.find("td:eq(3)").text());
+            $("input[name='Gender'][value='" + row.find("td:eq(4)").text() + "']").prop("checked", true);
+            $("#PanNo").val(row.find("td:eq(5)").text());
+            $("#AadharNo").val(row.find("td:eq(6)").text());
+            $("#PassportNo").val(row.find("td:eq(7)").text());
+            $("#VoterId").val(row.find("td:eq(8)").text());
+            $("#DrivingNo").val(row.find("td:eq(9)").text());
+
+            $("#btnAdd").hide();
+            $("#btnUpdate").show();
+        });
+
+        // 🟣 UPDATE Student
+        $("#btnUpdate").click(function () {
+            const data = {
+                StudentId: $("#StudentId").val(),
+                FullName: $("#FullName").val(),
+                Email: $("#Email").val(),
+                MobileNo: $("#MobileNo").val(),
+                Gender: $("input[name='Gender']:checked").val(),
+                PanNo: $("#PanNo").val(),
+                AadharNo: $("#AadharNo").val(),
+                PassportNo: $("#PassportNo").val(),
+                VoterId: $("#VoterId").val(),
+                DrivingNo: $("#DrivingNo").val()
+            };
+
+            $.ajax({
+                url: '/Student/Update',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (res) {
+                    if (res.success) {
+                        alert("🟢 Student Updated Successfully!");
+                        location.reload();
+                    } else {
+                        alert("❌ " + res.message);
+                    }
+                },
+                error: function (err) {
+                    alert("⚠️ " + err.responseText);
+                }
+            });
+        });
+
+        // 🔴 DELETE Student
+        $(document).on("click", ".btnDelete", function () {
+            let id = $(this).closest("tr").data("id");
+
+            if (confirm("Are you sure to delete this student?")) {
+                $.ajax({
+                    url: '/Student/Delete',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ id: id }),
+                    success: function (res) {
+                        if (res.success) {
+                            alert("🗑️ Student Deleted Successfully!");
+                            location.reload();
+                        } else {
+                            alert("❌ " + res.message);
+                        }
+                    },
+                    error: function (err) {
+                        alert("⚠️ " + err.responseText);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
